@@ -1,0 +1,25 @@
+cx<-"12"
+tmpss<-function()
+{
+  return("hello")
+}
+x<-switch(cx,'12'=return(tmpss()),'13'=cat("sss"))
+x
+divnum<-function(a,b){
+  tryCatch({
+    result<-ksvm(y~.,dataTable[,-1])
+  },error=function(e){
+    conditionMessage(e)
+  })
+  result
+}
+divnum(5,"12")
+result<-ksvm(1,12)
+cat("dd")
+i<-"dwqdqw"
+iters<-c(1,3,5,'o',6)
+res<-rep(NA,length(iters))
+for(i in 1:length(iters))
+{
+  res[i]=as.integer(iters[i])
+}
