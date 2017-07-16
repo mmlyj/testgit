@@ -103,15 +103,20 @@ sbfFuncs<-function(inData,funcs)##ldaSBF,treebagSBF,nbSBF,rfSBF,https://topepo.g
 }
 trainModelSf<-function(inData,funcs)#lasso,C5.0,gbm,glmnet,xgbTree,xgbLinear
 {
+  allowParellelHere<-TRUE
   dataTempSf<-inData;
   if(!is.factor( inData$y))
     dataTempSf$y<-factor(dataTempSf$y,levels=c(0,1),labels=c("NO", "Yes"))
-  if(funcs %in% c("lasso","ridge")) 
+  if(funcs %in% c("lasso")) 
     dataTempSf$y<-as.numeric(dataTempSf$y)
+  if(funcs %in% c("xgbLinear","xgbTree")) ## xgb will parallel auto ,so turn off it here
+  {
+    allowParellelHere<-FALSE
+  }  
   set.seed(globalSeeds)
   tmpModel<-train(y~.,data = dataTempSf,
         method=funcs,
-        trControl=trainControl(method = "repeatedcv",number = 10,repeats = 5 )    
+        trControl=trainControl(method = "repeatedcv",number = 10,repeats = 5,allowParallel = allowParellelHere )    
   )
   subtmp<-predictors(tmpModel)
   #returnTmpVar<-list(tag=funcs,subset=subtmp)
@@ -157,7 +162,7 @@ fillFeatureList<-function(dealDataFrame)#fill the globalFeatureList using
        try(globalFeatureList[[i]]$var<<-connectFeatureListAndFunc(dealDataFrame,names(globalFeatureList[i])))
       print(c(names(globalFeatureList[i]),"done"))
       #for closing the wrong way of selection
-        if(is.null(globalFeatureList[[i]]$var)) globalFeatureList[[i]]$switch<-FALSE
+        if(is.null(globalFeatureList[[i]]$var)) globalFeatureList[[i]]$switch<<-FALSE
     }
   }
  
