@@ -153,7 +153,9 @@ fillFeatureList<-function(dealDataFrame)#fill the globalFeatureList using
   {
     if(globalFeatureList[[i]]$switch==TRUE)
     { ##using try for stepping over error
+      print(c(names(globalFeatureList[i]),"deaing"))
        try(globalFeatureList[[i]]$var<<-connectFeatureListAndFunc(dealDataFrame,names(globalFeatureList[i])))
+      print(c(names(globalFeatureList[i]),"done"))
       #for closing the wrong way of selection
         if(is.null(globalFeatureList[[i]]$var)) globalFeatureList[[i]]$switch<-FALSE
     }

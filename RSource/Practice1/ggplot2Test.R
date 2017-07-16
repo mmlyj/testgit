@@ -11,4 +11,4 @@ longtest<-melt_roc(test,"D",c("M1","M2"))
 basicplot <- ggplot(longtest, aes(d = D, m = M,color =name)) + geom_roc()
 basicplot
 seq(0,1,by=0.1)
-#seq_along()  
+#seq_along()  2121

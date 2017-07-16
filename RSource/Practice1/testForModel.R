@@ -1,46 +1,60 @@
-fillModelList<-function(dealDataFrame)
+fillModelList<-function(dataToBeDeal)
 {
-  for(i in c(1:length(globalModelList)))
+  
+  for(j in c(1:length(globalFeatureList)))
   {
-    if(globalModelList[[i]]$switch)
+    if(globalFeatureList[[j]]$switch)
     {
-      for(j in c(1:length(globalFeatureList)))
+      dealDataFrame<-dataToBeDeal[,c("y",globalFeatureList[[j]]$var)]
+      for(i in c(1:length(globalModelList)))
       {
-        if(globalFeatureList[[j]]$switch)
+        if(globalModelList[[i]]$switch)
         {
-              dealDataFrame<-dealDataFrame[,globalFeatureList[[j]]$var]
-              if(is.null(globalModelControl))
-              {
-                tempTrainCtrl<-trainControl()
-              }
-              else
-              {
-                tempTrainCtrl<-globalModelControl##using the globalModelControl
-              }
-              if(is.null(globalModelList[[i]]$parametersGrid)||globalSerach=="random")
-              {
-                tempGrid<-NULL;
-              } 
-              else
-              {
-                tempGrid<-globalModelList[[i]]$parametersGrid;
-              }
-              set.seed(globalSeeds)
-              tmpComparedModel<-train(y~.,data = dealDataFrame,
-                                          method=names(globalModelList[i]),
-                                          trControl=tempTrainCtrl,
-                                          tuneGrid=tempGrid,metric=globalModelEvalMetric)
-            if(!is.null(globalModelList[[i]]$Model)&&!is.null(tmpComparedModel))
-            {
-              if(globalModelEvalMetric=="Accuracy")
-                if(max(globalModelList[[i]]$Model$results$Accuracy)<max(tmpComparedModel$results$Accuracy))
-                        globalModelList[[i]]$Model<<-tmpComparedModel
-              if(globalModelEvalMetric=="ROC")
-                if(max(globalModelList[[i]]$Model$results$ROC)<max(tmpComparedModel$results$ROC))
-                  globalModelList[[i]]$Model<<-tmpComparedModel
-            }
+          if(is.null(globalModelControl))
+          {
+            tempTrainCtrl<-trainControl()
           }
+          else
+          {
+            tempTrainCtrl<-globalModelControl##using the globalModelControl
+          }
+          if(is.null(globalModelList[[i]]$parametersGrid)||globalSerach=="random")
+          {
+            tempGrid<-NULL;
+          } 
+          else
+          {
+            tempGrid<-globalModelList[[i]]$parametersGrid;
+          }
+          set.seed(globalSeeds)
+          print(c(names(globalFeatureList[j]),names(globalModelList[i]),"dealing"))
+        try(tmpComparedModel<-train(y~.,data = dealDataFrame,
+                                      method=names(globalModelList[i]),
+                                      trControl=tempTrainCtrl,
+                                      tuneGrid=tempGrid,metric=globalModelEvalMetric))
+        if(exists("tmpComparedModel")&&!is.null(tmpComparedModel))
+        {
+          if(!is.null(globalModelList[[i]]$Model))
+          {
+            if(globalModelEvalMetric=="Accuracy")
+              if(max(globalModelList[[i]]$Model$results$Accuracy)<max(tmpComparedModel$results$Accuracy))
+                      globalModelList[[i]]$Model<<-tmpComparedModel
+            if(globalModelEvalMetric=="ROC")
+              if(max(globalModelList[[i]]$Model$results$ROC)<max(tmpComparedModel$results$ROC))
+                globalModelList[[i]]$Model<<-tmpComparedModel
+          }
+          else
+          {
+            globalModelList[[i]]$Model<<-tmpComparedModel
+          }
+            print(c(names(globalFeatureList[j]),names(globalModelList[i]),"done"))
         }
+         else 
+         {
+           print(c(names(globalFeatureList[j]),names(globalModelList[i]),"error"))
+         }
+        }
+      }
     }
   }
 }

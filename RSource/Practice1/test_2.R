@@ -65,3 +65,34 @@ glmnetEvl<- function(subset) {
 }
 
 subset <- hill.climbing.search(names(dataTempSf[,-1]), glmnetEvl)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+resamps <- resamples(list(knn = globalModelList$knn$Model,
+   nb = globalModelList$nb$Model,
+  C5.0 = globalModelList$C5.0$Model,
+   rf=globalModelList$rf$Model,
+  svmLinear=globalModelList$svmLinear$Model,
+  svmRadial=globalModelList$svmRadial$Model,
+  gbm=globalModelList$gbm$Model,
+  adaboost=globalModelList$adaboost$Model,
+  glmnet=globalModelList$glmnet$Model,
+  nnet=globalModelList$nnet$Model,
+  pls=globalModelList$pls$Model
+))
+trellis.par.set(caretTheme())
+dotplot(resamps, metric = "Accuracy")

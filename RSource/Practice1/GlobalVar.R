@@ -17,6 +17,22 @@ globalPercentOfTrain<-0.8
 globalDataTable<-data.table(read.csv(globalInputPath))
 globalDataTable<-centerAndScale(globalDataTable)
 globalDataTable<-implementsRf(globalDataTable)
+for (i in 1:length(globalFeatureList))
+  globalFeatureList[[i]]$switch<-TRUE
+for (i in 1:length(globalModelList))
+  globalModelList[[i]]$switch<-TRUE
+remove(i)
+globalDataTable$y<-factor(globalDataTable$y,levels=c(0,1),labels=c("NO", "Yes"))
+# globalFeatureList$svmLinearEvlsearch$switch<-FALSE
+# globalFeatureList$adaboostsearch$switch<-FALSE
+# globalFeatureList$lasso$switch<-FALSE
+# globalFeatureList$gbm$switch<-FALSE
+# globalFeatureList$xgbLinear$switch<-FALSE
+# globalFeatureList$xgbTree$switch<-FALSE
+system.time(fillFeatureList(globalDataTable))
+# globalModelList$xgbLinear$switch<-FALSE
+# globalModelList$xgbTree$switch<-FALSE
+system.time(fillModelList(globalDataTable))
 #set.seed(globalSeeds)
 # indataTrain<-createDataPartition(dataTable$y,p=percentOfTrain,list = FALSE)
 # dataTrain<-dataTable[indataTrain,]
