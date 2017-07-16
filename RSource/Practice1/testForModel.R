@@ -1,3 +1,16 @@
+constructModelList<-function()##construct ModelList
+{
+  modelColNames<-c('xgbLinear','xgbTree','adaboost','gbm','glmnet','knn','nb','C5.0','nnet','svmRadial','svmLinear','rf')
+  modelRowNames<-c('switch','parametersGrid','Model','FeatureMethods')
+  ##set the default control and param
+  control<-list(FALSE,NULL,NULL,NULL)
+  names(control)<-modelRowNames
+  control<-list(control)
+  ModelList<-rep(control,length(modelColNames))
+  names(ModelList)<-modelColNames
+  return(ModelList)
+}
+#######
 fillModelList<-function(dataToBeDeal)
 {
   
@@ -47,6 +60,7 @@ fillModelList<-function(dataToBeDeal)
           {
             globalModelList[[i]]$Model<<-tmpComparedModel
           }
+          globalModelList[[i]]$Model$FeatureMethods<<-names(globalFeatureList[j])
             print(c(names(globalFeatureList[j]),names(globalModelList[i]),"done"))
         }
          else 

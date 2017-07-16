@@ -39,19 +39,7 @@ loadPackages<-function()##
   
   # library(klaR)
 }
-constructModelList<-function()##construct ModelList
-{
-  modelColNames<-c('xgbLinear','xgbTree','adaboost','gbm','glmnet','knn','nb','C5.0','nnet','svmRadial','svmLinear','rf')
-  modelRowNames<-c('switch','parametersGrid','Model')
-  ##set the default control and param
-  control<-list(FALSE,NULL,NULL)
-  names(control)<-modelRowNames
-  control<-list(control)
-  ModelList<-rep(control,length(modelColNames))
-  names(ModelList)<-modelColNames
-  return(ModelList)
-}
-#######
+
 rangeData<-function(inData) ##range 0-1 receive dataframe ,excluding y auto
 {
   inData<-predict(preProcess(inData[,-1],method = 'range'),inData)
