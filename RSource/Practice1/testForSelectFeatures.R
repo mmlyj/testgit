@@ -107,7 +107,7 @@ trainModelSf<-function(inData,funcs)#lasso,C5.0,gbm,glmnet,xgbTree,xgbLinear
   dataTempSf<-inData;
   if(!is.factor( inData$y))
     dataTempSf$y<-factor(dataTempSf$y,levels=c(0,1),labels=c("NO", "Yes"))
-  if(funcs %in% c("lasso")) 
+  if(funcs %in% c("lasso"))
     dataTempSf$y<-as.numeric(dataTempSf$y)
   if(funcs %in% c("xgbLinear","xgbTree")) ## xgb will parallel auto ,so turn off it here
   {
@@ -124,8 +124,7 @@ trainModelSf<-function(inData,funcs)#lasso,C5.0,gbm,glmnet,xgbTree,xgbLinear
 }
 connectFeatureListAndFunc<-function(inputDataFrame,functionName)
 {
-  if(functionName %in% c('lasso','C5.0','gbm','glmnet','xgbTree','xgbLinear'))
-    varTmpVar<-trainModelSf(inputDataFrame,functionName)
+  
   if(functionName=='svmLinearEvlsearch')
     varTmpVar<-hill.climbing.search.svmLinearEvl(inputDataFrame)
   if(functionName=='adaboostsearch')
@@ -139,15 +138,11 @@ connectFeatureListAndFunc<-function(inputDataFrame,functionName)
            'rfenbFuncs'=varTmpVar<-rfeFuncs(inputDataFrame,nbFuncs)
            )
   }
-  if(functionName %in% c('ldaSBF','treebagSBF','nbSBF','rfSBF'))
-  {
-    switch(functionName,
-           'ldaSBF'=varTmpVar<-sbfFuncs(inputDataFrame,ldaSBF),
-           'treebagSBF'=varTmpVar<-sbfFuncs(inputDataFrame,treebagSBF),
-           'nbSBF'=varTmpVar<-sbfFuncs(inputDataFrame,nbSBF),
-           'rfSBF'=varTmpVar<-sbfFuncs(inputDataFrame,rfSBF)
-    )
-  }
+  if(functionName == 'ldaSBF')
+     varTmpVar<-sbfFuncs(inputDataFrame,ldaSBF)
+  
+  if(functionName %in% c('lasso','C5.0','gbm','glmnet','xgbTree','xgbLinear'))
+    varTmpVar<-trainModelSf(inputDataFrame,functionName)
   return(varTmpVar)
 }
 
@@ -158,9 +153,9 @@ fillFeatureList<-function(dealDataFrame)#fill the globalFeatureList using
   {
     if(globalFeatureList[[i]]$switch==TRUE)
     { ##using try for stepping over error
-      print(c(names(globalFeatureList[i]),"deaing"))
+     cat(names(globalFeatureList[i]),"is building\n")
        try(globalFeatureList[[i]]$var<<-connectFeatureListAndFunc(dealDataFrame,names(globalFeatureList[i])))
-      print(c(names(globalFeatureList[i]),"done"))
+      cat(names(globalFeatureList[i]),"is done\n")
       #for closing the wrong way of selection
         if(is.null(globalFeatureList[[i]]$var)) globalFeatureList[[i]]$switch<<-FALSE
     }

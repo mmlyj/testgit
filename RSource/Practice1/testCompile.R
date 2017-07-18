@@ -1,3 +1,7 @@
+
+# 'treebagSBF'=varTmpVar<-sbfFuncs(inputDataFrame,treebagSBF),
+# 'nbSBF'=varTmpVar<-sbfFuncs(inputDataFrame,nbSBF),
+# 'rfSBF'=varTmpVar<-sbfFuncs(inputDataFrame,rfSBF)
 # TstFun <- function()
 # {
 #   

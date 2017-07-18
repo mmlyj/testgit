@@ -10,7 +10,6 @@ constructModelList<-function()##construct ModelList
   names(ModelList)<-modelColNames
   return(ModelList)
 }
-#######
 fillModelList<-function(dataToBeDeal)
 {
   
@@ -18,33 +17,20 @@ fillModelList<-function(dataToBeDeal)
   {
     if(globalFeatureList[[j]]$switch)
     {
-      dealDataFrame<-dataToBeDeal[,c("y",globalFeatureList[[j]]$var)]
       for(i in c(1:length(globalModelList)))
       {
         if(globalModelList[[i]]$switch)
         {
-          if(is.null(globalModelControl))
-          {
-            tempTrainCtrl<-trainControl()
-          }
-          else
-          {
-            tempTrainCtrl<-globalModelControl##using the globalModelControl
-          }
-          if(is.null(globalModelList[[i]]$parametersGrid)||globalSerach=="random")
-          {
-            tempGrid<-NULL;
-          } 
-          else
-          {
-            tempGrid<-globalModelList[[i]]$parametersGrid;
-          }
           set.seed(globalSeeds)
-          print(c(names(globalFeatureList[j]),names(globalModelList[i]),"dealing"))
-        try(tmpComparedModel<-train(y~.,data = dealDataFrame,
-                                      method=names(globalModelList[i]),
-                                      trControl=tempTrainCtrl,
-                                      tuneGrid=tempGrid,metric=globalModelEvalMetric))
+          
+        cat(sprintf("way of feature's selection:%s,the model is building:%s\n ",names(globalFeatureList[j]),names(globalModelList[i])))
+        try(tmpComparedModel<-train(x=as.data.frame(dataToBeDeal[,globalFeatureList[[j]]$var]),y= dataToBeDeal$y,
+        method=names(globalModelList[i]),
+        trControl=globalModelControl,
+        tuneGrid=if(is.null(globalModelList[[i]]$parametersGrid)||globalSerach=="random") NULL else globalModelList[[i]]$parametersGrid,
+        metric=globalModelEvalMetric,
+        tuneLength = ifelse(globalModelControl$method == "none", 0,ifelse(globalSerach=="random",3,globalParamNum))#
+        ))
         if(exists("tmpComparedModel")&&!is.null(tmpComparedModel))
         {
           if(!is.null(globalModelList[[i]]$Model))
@@ -60,12 +46,12 @@ fillModelList<-function(dataToBeDeal)
           {
             globalModelList[[i]]$Model<<-tmpComparedModel
           }
-          globalModelList[[i]]$Model$FeatureMethods<<-names(globalFeatureList[j])
-            print(c(names(globalFeatureList[j]),names(globalModelList[i]),"done"))
+          globalModelList[[i]]$FeatureMethods<<-names(globalFeatureList[j])
+          cat(sprintf(" %s is done\n",names(globalModelList[i])))
         }
          else 
          {
-           print(c(names(globalFeatureList[j]),names(globalModelList[i]),"error"))
+           cat(sprintf("error of building %s using %s\n",names(globalModelList[i]),names(globalFeatureList[j])))
          }
         }
       }
@@ -73,9 +59,9 @@ fillModelList<-function(dataToBeDeal)
   }
 }
  
-fillModelControl<-function(methodsUsing="repeatedcv")#repeatedcv,none,cv
+fillModelControl<-function(methodsUsing="boot")#repeatedcv,none,cv
 {
   globalModelControl<<-trainControl(method = methodsUsing)
   if(globalModelEvalMetric=="ROC") globalModelControl$summaryFunction<<-twoClassSummary()
-  if(globalSerach=="random") Modelcontrol$search<<-globalSerach
+  if(globalSerach=="random") globalModelControl$search<<-globalSerach
 }
